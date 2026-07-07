@@ -27,24 +27,6 @@ Drop your save here or <input id="file" type="file">
 
 <script>
 const normalSets={
-/*
-arcane_set:{tiers:[2,4,6],effects:["5% Mana Burst","20% Mana Burst","25% Mana Burst + 2ed Trigger"]},
-beast_set:{tiers:[3,5],effects:["20% Damage to Other Enemies","60% Damage to Other Enemies"]},
-darkthorn_set:{tiers:[2,4,6],effects:["10 HP, 3 Regen. DMG to enemies equal health restored.","20 HP / 5 Regen. DMG to Enemies Equal to x2 Health Restored.","30 HP / 8 Regen. DMG to Enemies Equal to x3 Health Restored."]},
-faceless_set:{tiers:[3,5],effects:["80% Damage Amp & -2 Health","120% Damage Amp & -2 Health"]},
-fae_set:{tiers:[2,4,6],effects:["4 Hex or 2% Swiftness if Hexxed","8 Hex or 4% Swiftness if Hexxed","12 Hex or 6% Swiftness Hexxed"]},
-ironclad_set:{tiers:[2,4,6],effects:["When Barrier Broken: 1 Guard, 3 Thorns, and 3% Max Health Damage to Enemy","When Barrier Broken: 2 Guard, 4 Thorns, 6% Max Health Damage to Enemy","When Barrier Broken: 3 Guard, 5 Thorns, 10% Max Health Damage to Enemy"]},
-legion_set:{tiers:[2,4,6],effects:["15% DR, +3 Rage Per Round","35% DR, +5 Rage Per Round","50% DR, +8 Rage Per Round"]},
-occult_set:{tiers:[3,5],effects:["50% Chance of Potion Per ROund Clear","50% Chance of Potion Per Round Clear & Potions on Enemies Affect all Enemies, You're potions Have Double Effect."]},
-rogue_set:{tiers:[2,4,6],effects:["%5 Crit/DMG","15 Crit / 25% DMG","20 Crit / 50% Damage"]},
-ronin_set:{tiers:[2,4,6],effects:["10% Counter and Apply 3 Wound","20% Counter and Apply 3 Weakness","30% Counter and Attacks Apply 5 Wound, Dodging Applies 5 Weakness"]},
-royal_set:{tiers:[3,5],effects:["+1 to Positive Stacks, +4 When Applying Negative Stacks.","+2 to Positive Stacks, +6 When Applying Negative Stacks."]},
-saltwater_set:{tiers:[3,5],effects:["30% Chance Normal Chests Become Golden Chests","30% Chance Normal Chests Become Golden Chests & Upgraded Loot Found in Chests"]},
-sylvan_set:{tiers:[2,4,6],effects:["5% Swiftness","30% Swiftness","35% Swiftness +10% Damage Amp"]},
-taboo_set:{tiers:[3,5],effects:["35% Chance to Stun. When Enemies Break Stun, 20+5% Max HP DMG","55% Chance to Stun. When Enemies Break Stun, 20+8% Max HP DMG"]},
-villager_set:{tiers:[3,5],effects:["Items Drop as if You've Completed an Additional 15 Areas","Items Drop as if You've Completed an Additional 25 Areas"]}
-};
-*/
 
 arcane_set:{tiers:[2,4,6],effects:["5% Mana Burst","20% Mana Burst","25% Mana Burst. Mana Burst triggers an additional time."]},
 beast_set:{tiers:[3,5],effects:["Whenever you attack, 20% of your damage is dealt to all other enemies as an attack.","Whenever you attack, 60% of your damage is dealt to all other enemies as an attack."]},
@@ -97,7 +79,7 @@ function capitalizeWords(str) {
 }
 
 let rows=[];
-let sortKey="name",asc=true;
+let sortKey="lvl",asc=true;
 
 function render(){
  let data=[...rows];
@@ -113,7 +95,7 @@ function render(){
    return asc?av.localeCompare(bv):bv.localeCompare(av);
  });
  let h='<table><tr>';
- [["name","Set"],["qty","Qty"],["lvl","Level"],["effect","Effect"]].forEach(c=>{
+ [["name","Set ⇅"],["qty","Qty ⇅"],["lvl","Level ⇅"],["effect","Effect ⇅"]].forEach(c=>{
    h+=`<th onclick="sortBy('${c[0]}')">${c[1]}</th>`;
  });
  h+='</tr>';
