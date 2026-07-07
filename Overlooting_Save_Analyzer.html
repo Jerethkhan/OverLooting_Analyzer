@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Overlooting Save Analyzer - Sets</title>
+<style>
+body{background:#1e1e1e;color:#eee;font-family:Segoe UI,Arial,sans-serif;margin:20px}
+h1{color:#ffd54f}
+#drop{border:2px dashed #666;padding:20px;border-radius:8px;text-align:center;margin-bottom:15px}
+table{width:100%;border-collapse:collapse}
+th,td{border:1px solid #555;padding:6px}
+th{background:#333;cursor:pointer;user-select:none}
+.max{background:#1f4f1f}
+.partial{background:#9b7b1e; color:#fff}
+.inactive{background:#5b1f1f}
+.mythic{background:#203a64}
+</style></head>
+<body>
+<h1>Overlooting Save Analyzer - Sets</h1>
+
+<div id="drop">
+Drop your save here or <input id="file" type="file">
+</div>
+<div id="summary"></div>
+<div id="output"></div>
+
+<script>
+const normalSets={
+/*
+arcane_set:{tiers:[2,4,6],effects:["5% Mana Burst","20% Mana Burst","25% Mana Burst + 2ed Trigger"]},
+beast_set:{tiers:[3,5],effects:["20% Damage to Other Enemies","60% Damage to Other Enemies"]},
+darkthorn_set:{tiers:[2,4,6],effects:["10 HP, 3 Regen. DMG to enemies equal health restored.","20 HP / 5 Regen. DMG to Enemies Equal to x2 Health Restored.","30 HP / 8 Regen. DMG to Enemies Equal to x3 Health Restored."]},
+faceless_set:{tiers:[3,5],effects:["80% Damage Amp & -2 Health","120% Damage Amp & -2 Health"]},
+fae_set:{tiers:[2,4,6],effects:["4 Hex or 2% Swiftness if Hexxed","8 Hex or 4% Swiftness if Hexxed","12 Hex or 6% Swiftness Hexxed"]},
+ironclad_set:{tiers:[2,4,6],effects:["When Barrier Broken: 1 Guard, 3 Thorns, and 3% Max Health Damage to Enemy","When Barrier Broken: 2 Guard, 4 Thorns, 6% Max Health Damage to Enemy","When Barrier Broken: 3 Guard, 5 Thorns, 10% Max Health Damage to Enemy"]},
+legion_set:{tiers:[2,4,6],effects:["15% DR, +3 Rage Per Round","35% DR, +5 Rage Per Round","50% DR, +8 Rage Per Round"]},
+occult_set:{tiers:[3,5],effects:["50% Chance of Potion Per ROund Clear","50% Chance of Potion Per Round Clear & Potions on Enemies Affect all Enemies, You're potions Have Double Effect."]},
+rogue_set:{tiers:[2,4,6],effects:["%5 Crit/DMG","15 Crit / 25% DMG","20 Crit / 50% Damage"]},
+ronin_set:{tiers:[2,4,6],effects:["10% Counter and Apply 3 Wound","20% Counter and Apply 3 Weakness","30% Counter and Attacks Apply 5 Wound, Dodging Applies 5 Weakness"]},
+royal_set:{tiers:[3,5],effects:["+1 to Positive Stacks, +4 When Applying Negative Stacks.","+2 to Positive Stacks, +6 When Applying Negative Stacks."]},
+saltwater_set:{tiers:[3,5],effects:["30% Chance Normal Chests Become Golden Chests","30% Chance Normal Chests Become Golden Chests & Upgraded Loot Found in Chests"]},
+sylvan_set:{tiers:[2,4,6],effects:["5% Swiftness","30% Swiftness","35% Swiftness +10% Damage Amp"]},
+taboo_set:{tiers:[3,5],effects:["35% Chance to Stun. When Enemies Break Stun, 20+5% Max HP DMG","55% Chance to Stun. When Enemies Break Stun, 20+8% Max HP DMG"]},
+villager_set:{tiers:[3,5],effects:["Items Drop as if You've Completed an Additional 15 Areas","Items Drop as if You've Completed an Additional 25 Areas"]}
+};
+*/
+
+arcane_set:{tiers:[2,4,6],effects:["5% Mana Burst","20% Mana Burst","25% Mana Burst. Mana Burst triggers an additional time."]},
+beast_set:{tiers:[3,5],effects:["Whenever you attack, 20% of your damage is dealt to all other enemies as an attack.","Whenever you attack, 60% of your damage is dealt to all other enemies as an attack."]},
+darkthorn_set:{tiers:[2,4,6],effects:["After restoring health, deal damage to all enemies equal to the health restored. Also, gain 10 Max Health and 3 Regeneration per level.","After restoring health, deal damage to all enemies equal to double the health restored. Also, gain 20 Max Health and 5 Regeneration per level.","After restoring health, deal damage to all enemies equal to tripple the health restored. Also, gain 30 Max Health and 8 Regeneration per level."]},
+faceless_set:{tiers:[3,5],effects:["Gain 80% Damage amplification, but lose 2 health whenever you attack.","Gain 120% Damage amplification, but lose 1 health whenever you attack."]},
+fae_set:{tiers:[2,4,6],effects:["Whenever an enemy receives damage, if it suffers Hex, gain 2% Swiftness. If not, apply 4 stacks of Hex to it.","Whenever an enemy receives damage, if it suffers Hex, gain 4% Swiftness. If not, apply 8 stacks of Hex to it.","Whenever an enemy receives damage, if it suffers Hex, gain 6% Swiftness. If not, apply 12 stacks of Hex to it."]},
+ironclad_set:{tiers:[2,4,6],effects:["When one of your Barriers is broken, gain 3 Thorns. If an enemy broke it, it receives damage based on 3% of its Max Health. Also, gain 1 Guard.","When one of your Barriers is broken, gain 4 Thorns. If an enemy broke it, it receives damage based on 6% of its Max Health. Also, gain 2 Guard.","When one of your Barriers is broken, gain 5 Thorns. If an enemy broke it, it receives damage based on 10% of its Max Health. Also, gain 3 Guard."]},
+legion_set:{tiers:[2,4,6],effects:["Gain 3 Rage at the end of the round and reduce all damage received by 15%.","Gain 5 Rage at the end of the round and reduce all damage received by 35%.","Gain 8 Rage at the end of the round and reduce all damage received by 50%."]},
+occult_set:{tiers:[3,5],effects:["50% chance of gaining a potion after clearing a Combat Area.","50% chance of gaining a potion after clearing a Combat Area. Also, while in combat (that is, after having already attacked an enemy), potions dropped on enemies apply their effect to all enemies and potions dropped on you have their effect doubled."]},
+rogue_set:{tiers:[2,4,6],effects:["The first time you critically strike each round, gain an extra attack that cannot critically strike. Also, gain 5% Critical Chance and 5% Critical Damage.","The first time you critically strike each round, gain an extra attack that cannot critically strike. Also, gain 15% Critical Chance and 25% Critical Damage.","The first time you critically strike each round, gain an extra attack that cannot critically strike. Also, gain 20% Critical Chance and 50% Critical Damage."]},
+ronin_set:{tiers:[2,4,6],effects:["Your attacks apply 3 Wound. Also, gain 10% Counterattack.","Your attacks apply 3 Wound and dodging applies 3 Weakness to the enemy that attacked you. Also, gain 20% Counterattack.","Your attacks apply 5 Wound and dodging applies 5 Weakness to the enemy that attacked you. Also, gain 30% Counterattack."]},
+royal_set:{tiers:[3,5],effects:["When applying a negative Status or gaining a positive one, apply 1 extra stack and gain 4 extra stacks.","When applying a negative Status or gaining a positive one, apply 2 extra stack and gain 6 extra stacks."]},
+saltwater_set:{tiers:[3,5],effects:["Gain a 30% chance for Golden Chests to spawn after clearing a Combat Area","Gain a 30% chance for Golden Chests to spawn after clearing a Combat Area. Also, items found in Golden Chests are upgraded."]},
+sylvan_set:{tiers:[2,4,6],effects:["Whenever you attack, gain 5% Damage Amplification. Also, gain 5% Swiftness.","Whenever you attack, gain 5% Damage Amplification. Also, gain 30% Swiftness.","Whenever you attack, gain 10% Damage Amplification. Also, gain 35% Swiftness."]},
+taboo_set:{tiers:[3,5],effects:["When an enemy attacks you, it has a 35% chance of being stunned. Also, enemies take 20+5% Max Health damage when breaking free of a stun.","When an enemy attacks you, it has a 55% chance of being stunned. Also, enemies take 20+8% Max Health damage when breaking free of a stun."]},
+villager_set:{tiers:[3,5],effects:["Items drop as if you had progressed through +15 more Areas.","Items drop as if you had progressed through +25 more Areas."]}
+};
+
+const mythics = {
+  aegis_mythic: "When attacking, your Thorns are added to your physical damage. Whenever an enemy damages you, gain 2 Thorns.",
+  ancestral_mythic: "Whenever your Mana Burst triggers, gain 20% Mana Burst.",
+  blasphemous_mythic: "Your attacks execute enemies under 25% of their life.",
+  blessed_mythic: "Whenever you heal, remove a negative Status. If you don't suffer any, restore 1 additional health.",
+  celestial_mythic: "Your counterattacks always critically strike.",
+  chained_mythic: "When entering an Event Area, upgrade a random level 1 item that you have equipped.",
+  decadent_mythic: "Whenever Poison stacks are applied to an enemy, the same amount of Wound stacks are also applied to it.",
+  doomed_mythic: "When an enemy attacks you, apply Poison to it equal to your Poisonous.",
+  draconic_mythic: "You have an extra 5% Damage Amplification for every Rage stack.",
+  dual_mythic: "While you have Armor, you receive 25% less damage. While you don't, you deal 25% more damage.",
+  eternal_mythic: "At the end of the round, gain Armor equal to 10% of your base Armor.",
+  golden_mythic: "After dodging an attack, all the damage you would receive that round is halved.",
+  heavy_mythic: "Whenever an enemy breaks free of a Stun, apply 20 Weakness to it.",
+  immovable_mythic: "All damage received is reduced by 2. This effect increases by 2 at the end of the round.",
+  infernal_mythic: "When attacking an enemy that suffers from any negative Status, apply 3 additional stacks of each negative Status it is affected by.",
+  insatiable_mythic: "Gain 100% Damage Amplification after killing the first enemy each combat.",
+  lord_mythic: "At the end of the round, lose 1 health and gain 20% Damage Amplification. Each trigger increases the health lost by 1 and Damage Amplification gained by 20%.",
+  luminous_mythic: "Your Luck is transformed into Damage Amplification.",
+  mercurial_mythic: "The first equipped item of each set adds +1 to its Set bonus (excluding Mythic items).",
+  mirrored_mythic: "Whenever an enemy breaks one of your Barriers, apply 20 Wound to it.",
+  performer_mythic: "The first time you critically strike each round, gain Armor equal to 10% of the damage dealt.",
+  polychrome_mythic: "Whenever you enter an Area, trigger one random effect: Restore 20% Health, Enemies lose 20% Health, Gain 2 Barrier, Gain 20 Rage, or Obtain a random Legendary item.",
+  psychopomp_mythic: "After killing an enemy, permanently gain 1% Damage Amplification.",
+  speedster_mythic: "When attacking, gain 5% Swiftness. Swiftness over 100% has a chance to trigger another attack (and repeats at 200%, 300%, etc.).",
+  unstoppable_mythic: "Your attacks ignore Barriers and Thorns, can't miss, and aren't affected by Weakness.",
+  versatile_mythic: "If your Magic Damage is greater than your Physical Damage, all damage becomes Magic and you gain 50% Mana Burst. Otherwise, all damage becomes Physical and you gain 50% Critical Chance and 10% Lifesteal."
+};
+
+function capitalizeWords(str) {
+  return str.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+}
+
+let rows=[];
+let sortKey="name",asc=true;
+
+function render(){
+ let data=[...rows];
+ data.sort((a,b)=>{
+   let av=a[sortKey],bv=b[sortKey];
+   if(sortKey==="qty") {
+     // Parse the numeric part from "x/y" format
+     const aNum = parseInt(av.split('/')[0]);
+     const bNum = parseInt(bv.split('/')[0]);
+     return asc ? aNum - bNum : bNum - aNum;
+   }
+   av=String(av);bv=String(bv);
+   return asc?av.localeCompare(bv):bv.localeCompare(av);
+ });
+ let h='<table><tr>';
+ [["name","Set"],["qty","Qty"],["lvl","Level"],["effect","Effect"]].forEach(c=>{
+   h+=`<th onclick="sortBy('${c[0]}')">${c[1]}</th>`;
+ });
+ h+='</tr>';
+ for(const r of data){
+   h+=`<tr class="${r.cls}"><td>${r.name}</td><td>${r.qty}</td><td>${r.lvl}</td><td>${r.effect}</td></tr>`;
+ }
+ h+='</table>';
+ output.innerHTML=h;
+}
+
+function sortBy(k){
+ if(sortKey===k) asc=!asc;
+ else{sortKey=k;asc=true;}
+ render();
+}
+
+function parse(txt){
+ rows=[];
+ let active=0,myOwned=0;
+ 
+ // Find all "key": { ... } patterns with quantity inside
+ let pos = 0;
+ 
+ while (pos < txt.length) {
+   // Find the next quoted key
+   const keyMatch = txt.substring(pos).match(/"([^"]+)"\s*:\s*\{/);
+   if (!keyMatch) break;
+   
+   const keyStart = pos + keyMatch.index;
+   const key = keyMatch[1];
+   const contentStart = keyStart + keyMatch[0].length;
+   
+   // Find the matching closing brace for this entry
+   let braceCount = 1;
+   let contentEnd = contentStart;
+   let inString = false;
+   let escape = false;
+   
+   while (contentEnd < txt.length && braceCount > 0) {
+     const ch = txt[contentEnd];
+     
+     if (escape) {
+       escape = false;
+     } else if (ch === '\\') {
+       escape = true;
+     } else if (ch === '"') {
+       inString = !inString;
+     } else if (!inString) {
+       if (ch === '{') braceCount++;
+       else if (ch === '}') braceCount--;
+     }
+     
+     contentEnd++;
+   }
+   
+   // Extract the full entry
+   const fullEntry = txt.substring(keyStart, contentEnd);
+   pos = contentEnd;
+   
+   // Look for quantity in this entry
+   const qtyMatch = fullEntry.match(/"quantity"\s*:\s*(\d+)/);
+   if (qtyMatch) {
+     const qty = parseInt(qtyMatch[1]);
+     
+     if (key.endsWith("_set")) {
+       const d = normalSets[key];
+       let lvl = "Inactive";
+       let effect = "Need more pieces";
+       let cls = "inactive";
+       let qtyDisplay = String(qty);
+       
+       if (d) {
+         const maxTier = d.tiers[d.tiers.length - 1];
+         qtyDisplay = qty + "/" + maxTier;
+         
+         let reachedTierIndex = -1;
+         for (let t = 0; t < d.tiers.length; t++) {
+           if (qty >= d.tiers[t]) {
+             reachedTierIndex = t;
+             effect = d.effects[t];
+           }
+         }
+         
+         const totalTiers = d.tiers.length;
+         
+         if (reachedTierIndex >= 0) {
+           lvl = (reachedTierIndex + 1) + "/" + totalTiers;
+           cls = (reachedTierIndex === totalTiers - 1) ? "max" : "partial";
+           active++;
+         } else {
+           lvl = "0/" + totalTiers;
+           effect = "Need " + d.tiers[0] + " pieces";
+           cls = "inactive";
+         }
+       }
+       
+       // Capitalize the display name
+       const displayName = capitalizeWords(key.replace("_set", ""));
+       rows.push({name: displayName, qty: qtyDisplay, lvl: lvl, effect: effect, cls: cls});
+     } else if (key.endsWith("_mythic")) {
+       if (qty > 0) {
+         myOwned++;
+         const displayName = capitalizeWords(key.replace("_mythic", "")) + " (Mythic)";
+         rows.push({
+           name: displayName,
+           qty: String(qty),
+           lvl: "Mythic",
+           effect: mythics[key] || "",
+           cls: "mythic"
+         });
+       }
+     }
+   }
+ }
+ 
+ summary.innerHTML = `<b>Active normal sets:</b> ${active}/15 &nbsp; <b>Owned Mythics:</b> ${myOwned}/26`;
+ render();
+}
+
+function loadFile(f){
+ const r=new FileReader();
+ r.onload=e=>parse(e.target.result);
+ r.readAsText(f);
+}
+file.addEventListener("change",e=>{if(e.target.files.length)loadFile(e.target.files[0]);});
+drop.addEventListener("dragover",e=>e.preventDefault());
+drop.addEventListener("drop",e=>{
+ e.preventDefault();
+ if(e.dataTransfer.files.length)loadFile(e.dataTransfer.files[0]);
+});
+</script></body></html>
