@@ -5,29 +5,27 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Overlooting Save Analyzer - Sets</title>
 <style>
-body{background:#1e1e1e;color:#eee;font-family:Segoe UI,Arial,sans-serif;margin:20px}
-h1{color:#ffd54f}
-#drop{border:2px dashed #666;padding:20px;border-radius:8px;text-align:center;margin-bottom:15px}
-table{width:100%;border-collapse:collapse}
-th,td{border:1px solid #555;padding:6px}
-th{background:#333;cursor:pointer;user-select:none}
-.max{background:#1f4f1f}
-.partial{background:#9b7b1e; color:#fff}
-.inactive{background:#5b1f1f}
-.mythic{background:#203a64}
-</style></head>
+  body{background:#1e1e1e;color:#eee;font-family:Segoe UI,Arial,sans-serif;margin:20px}
+  h1{color:#ffd54f}
+  #drop{border:2px dashed #666;padding:20px;border-radius:8px;text-align:center;margin-bottom:15px}
+  table{width:100%;border-collapse:collapse}
+  th,td{border:1px solid #555;padding:6px}
+  th{background:#333;cursor:pointer;user-select:none}
+  .max{background:#1f4f1f}
+  .partial{background:#9b7b1e; color:#fff}
+  .inactive{background:#5b1f1f}
+  .mythic{background:#203a64}
+</style>
+</head>
 <body>
-<h1>Overlooting Save Analyzer - Sets</h1>
+<h1>Overlooting Save Analyzer - Skill Sets</h1>
 
 <div id="drop">
-Drop your save here or upload from "%appdata%\Godot\app_userdata\Overlooting"<br><input id="file" type="file">
-</div>
-<div id="summary"></div>
-<div id="output"></div>
+Drop your save here or upload from "%appdata%\Godot\app_userdata\Overlooting" <br><input id="file" type="file">
+</div><div id="summary"></div><div id="output"></div>
 
 <script>
 const normalSets={
-
 arcane_set:{tiers:[2,4,6],effects:["5% Mana Burst","20% Mana Burst","25% Mana Burst. Mana Burst triggers an additional time."]},
 beast_set:{tiers:[3,5],effects:["Whenever you attack, 20% of your damage is dealt to all other enemies as an attack.","Whenever you attack, 60% of your damage is dealt to all other enemies as an attack."]},
 darkthorn_set:{tiers:[2,4,6],effects:["After restoring health, deal damage to all enemies equal to the health restored. Also, gain 10 Max Health and 3 Regeneration per level.","After restoring health, deal damage to all enemies equal to double the health restored. Also, gain 20 Max Health and 5 Regeneration per level.","After restoring health, deal damage to all enemies equal to tripple the health restored. Also, gain 30 Max Health and 8 Regeneration per level."]},
@@ -74,6 +72,53 @@ const mythics = {
   versatile_mythic: "If your Magic Damage is greater than your Physical Damage, all damage becomes Magic and you gain 50% Mana Burst. Otherwise, all damage becomes Physical and you gain 50% Critical Chance and 10% Lifesteal."
 };
 
+const setIcons = {
+    arcane: 'arcane.png',
+    beast: 'beast.png',
+    darkthorn: 'darkthorn.png',
+    faceless: 'faceless.png',
+    fae: 'fae.png',
+    ironclad: 'ironclad.png',
+    legion: 'legion.png',
+    occult: 'occult.png',
+    rogue: 'rogue.png',
+    ronin: 'ronin.png',
+    royal: 'royal.png',
+    saltwater: 'saltwater.png',
+    sylvan: 'sylvan.png',
+    taboo: 'taboo.png',
+    villager: 'villager.png'
+};
+
+const mythicIcons = {
+    aegis: 'aegis.png',
+    ancestral: 'ancestral.png',
+    blasphemous: 'blasphemous.png',
+    blessed: 'blessed.png',
+    celestial: 'celestial.png',
+    chained: 'chained.png',
+    decadent: 'decadent.png',
+    doomed: 'doomed.png',
+    draconic: 'draconic.png',
+    dual: 'dual.png',
+    eternal: 'eternal.png',
+    golden: 'golden.png',
+    heavy: 'heavy.png',
+    immovable: 'immovable.png',
+    infernal: 'infernal.png',
+    insatiable: 'insatiable.png',
+    lord: 'lord.png',
+    luminous: 'luminous.png',
+    mercurial: 'mercurial.png',
+    mirrored: 'mirrored.png',
+    performer: 'performer.png',
+    polychrome: 'polychrome.png',
+    psychopomp: 'psychopomp.png',
+    speedster: 'speedster.png',
+    unstoppable: 'unstoppable.png',
+    versatile: 'versatile.png'
+};
+
 function capitalizeWords(str) {
   return str.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 }
@@ -84,7 +129,8 @@ let sortKey="lvl",asc=true;
 function render(){
  let data=[...rows];
  data.sort((a,b)=>{
-   let av=a[sortKey],bv=b[sortKey];
+   let av=a[sortKey],
+	   bv=b[sortKey];
    if(sortKey==="qty") {
      // Parse the numeric part from "x/y" format
      const aNum = parseInt(av.split('/')[0]);
@@ -94,14 +140,26 @@ function render(){
    av=String(av);bv=String(bv);
    return asc?av.localeCompare(bv):bv.localeCompare(av);
  });
- let h='<table><tr>';
- [["name","Set ⇅"],["qty","Qty ⇅"],["lvl","Level ⇅"],["effect","Effect ⇅"]].forEach(c=>{
-   h+=`<th onclick="sortBy('${c[0]}')">${c[1]}</th>`;
+ 
+ let h='<table><tr>';[["name","Set ⇅"],["qty","Qty ⇅"],["lvl","Level ⇅"],["effect","Effect ⇅"]].forEach(c=>{
+	 h+=`<th onclick="sortBy('${c[0]}')">${c[1]}</th>`;
  });
  h+='</tr>';
- for(const r of data){
-   h+=`<tr class="${r.cls}"><td>${r.name}</td><td>${r.qty}</td><td>${r.lvl}</td><td>${r.effect}</td></tr>`;
- }
+
+for (const r of data) {
+   let nameDisplay = r.name;
+   const nameLower = r.name.toLowerCase().replace(' (mythic)', '');
+   //Add Regular Icon
+   if (r.cls !== 'mythic' && setIcons[nameLower]) {
+       nameDisplay = `<img src="icons/${setIcons[nameLower]}" alt="${r.name}" style="width:24px;height:24px;vertical-align:middle;margin-right:8px;">${r.name}`;
+   }
+   //Add Mythic Icon
+   else if (r.cls === 'mythic' && mythicIcons[nameLower]) {
+       nameDisplay = `<img src="icons/${mythicIcons[nameLower]}" alt="${r.name}" style="width:24px;height:24px;vertical-align:middle;margin-right:8px;">${r.name}`;
+   }
+   //Output
+   h += `<tr class="${r.cls}"><td>${nameDisplay}</td><td>${r.qty}</td><td>${r.lvl}</td><td>${r.effect}</td></tr>`;
+}
  h+='</table>';
  output.innerHTML=h;
 }
@@ -194,7 +252,13 @@ function parse(txt){
        
        // Capitalize the display name
        const displayName = capitalizeWords(key.replace("_set", ""));
-       rows.push({name: displayName, qty: qtyDisplay, lvl: lvl, effect: effect, cls: cls});
+       rows.push({
+		  name: displayName, 
+		  qty: qtyDisplay, 
+		  lvl: lvl, 
+		  effect: effect, 
+		  cls: cls
+		});
      } else if (key.endsWith("_mythic")) {
        if (qty > 0) {
          myOwned++;
@@ -221,7 +285,7 @@ function loadFile(f){
  r.readAsText(f);
 }
 file.addEventListener("change",e=>{if(e.target.files.length)loadFile(e.target.files[0]);});
-drop.addEventListener("dragover",e=>e.preventDefault());
+drop.addEventListener("dragover",e=>e.preventDefault()); 
 drop.addEventListener("drop",e=>{
  e.preventDefault();
  if(e.dataTransfer.files.length)loadFile(e.dataTransfer.files[0]);
